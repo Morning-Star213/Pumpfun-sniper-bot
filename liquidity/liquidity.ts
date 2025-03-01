@@ -13,16 +13,13 @@ import {
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { MinimalMarketLayoutV3 } from '../market';
 import BN from 'bn.js';
-
 export const RAYDIUM_LIQUIDITY_PROGRAM_ID_V4 = MAINNET_PROGRAM_ID.AmmV4;
 export const OPENBOOK_PROGRAM_ID = MAINNET_PROGRAM_ID.OPENBOOK_MARKET;
-
 export const MINIMAL_MARKET_STATE_LAYOUT_V3 = struct([
   publicKey('eventQueue'),
   publicKey('bids'),
   publicKey('asks'),
 ]);
-
 export function createPoolKeys(
   id: PublicKey,
   accountData: LiquidityStateV4,
@@ -62,7 +59,6 @@ export function createPoolKeys(
     lookupTableAccount: PublicKey.default,
   };
 }
-
 export async function getTokenAccounts(
   connection: Connection,
   owner: PublicKey,
@@ -75,7 +71,6 @@ export async function getTokenAccounts(
     },
     commitment,
   );
-
   const accounts: TokenAccount[] = [];
   for (const { pubkey, account } of tokenResp.value) {
     accounts.push({
@@ -84,10 +79,8 @@ export async function getTokenAccounts(
       accountInfo: SPL_ACCOUNT_LAYOUT.decode(account.data),
     });
   }
-
   return accounts;
 }
-
 export async function fetchInfo(connection:Connection,poolstate:LiquidityStateV4, poolkeys:LiquidityPoolKeys){
   const status=poolstate.status
   const baseDecimals=Number(poolkeys.baseDecimals)

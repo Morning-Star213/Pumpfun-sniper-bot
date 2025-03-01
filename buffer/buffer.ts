@@ -8,7 +8,6 @@ export class BufferRingBuffer {
     private tail: number;
     private count: number;
     private capacity: number;
-
     constructor(capacity: number) {
         this.capacity = capacity;
         this.buffer = new Array<Buffer | null>(capacity).fill(null);
@@ -16,15 +15,12 @@ export class BufferRingBuffer {
         this.tail = 0;
         this.count = 0;
     }
-
     isFull(): boolean {
         return this.count === this.capacity;
     }
-
     isEmpty(): boolean {
         return this.count === 0;
     }
-
     enqueue(item: Buffer): void {
         if (this.isFull()) {
             this.head = (this.head + 1) % this.capacity;
@@ -34,7 +30,6 @@ export class BufferRingBuffer {
         this.buffer[this.tail] = item;
         this.tail = (this.tail + 1) % this.capacity;
     }
-
     dequeue(): Buffer | null {
         if (this.isEmpty()) {
             return null;
@@ -45,7 +40,6 @@ export class BufferRingBuffer {
         this.count--;
         return item;
     }
-
     findPattern(publicKey: PublicKey): Buffer | false {
         const publicKeyBuffer = publicKey.toBuffer();
         const baseMintOffset = MARKET_STATE_LAYOUT_V3.offsetOf('quoteMint');

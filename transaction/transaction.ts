@@ -20,8 +20,6 @@ import { createPoolKeys, getTokenAccounts } from "../liquidity";
 import { retrieveEnvVariable } from "../utils";
 import { BN } from "bn.js";
 
-
-
 let wallet: Keypair;
 let quoteToken: Token;
 let quoteTokenAssociatedAddress: PublicKey;
@@ -29,9 +27,6 @@ let quoteAmount: TokenAmount;
 
 wallet = Keypair.fromSecretKey(bs58.decode(PRIVATE_KEY));
 quoteAmount = new TokenAmount(Token.WSOL, QUOTE_AMOUNT, false);
-
-
-
 export interface MinimalTokenAccountData {
     mint: PublicKey;
     address: PublicKey;
@@ -40,14 +35,11 @@ export interface MinimalTokenAccountData {
   };
 
 const existingTokenAccounts: Map<string, MinimalTokenAccountData> = new Map<string, MinimalTokenAccountData>();
-
 const solanaConnection = new Connection(RPC_ENDPOINT);
 
 // Init Function
-
 export async function init(): Promise<void> {
     logger.level = LOG_LEVEL;
-  
     // get wallet
     wallet = Keypair.fromSecretKey(bs58.decode(PRIVATE_KEY));
     logger.info(`Wallet Address: ${wallet.publicKey}`);
@@ -73,14 +65,12 @@ export async function init(): Promise<void> {
         throw new Error(`Unsupported quote mint "${QUOTE_MINT}". Supported values are USDC and WSOL`);
       }
     }
-  
     logger.info(
       `Script will buy all new tokens using ${QUOTE_MINT}. Amount that will be used to buy each token is: ${quoteAmount.toFixed(2).toString()}`,
     );
   
     // check existing wallet for associated token account of quote mint
     const tokenAccounts = await getTokenAccounts(solanaConnection, wallet.publicKey, COMMITMENT_LEVEL);
-  
     for (const ta of tokenAccounts) {
       existingTokenAccounts.set(ta.accountInfo.mint.toString(), <MinimalTokenAccountData>{
         mint: ta.accountInfo.mint,
@@ -89,20 +79,15 @@ export async function init(): Promise<void> {
     }
   
     const tokenAccount = tokenAccounts.find((acc) => acc.accountInfo.mint.toString() === quoteToken.mint.toString())!;
-  
     if (!tokenAccount) {
       throw new Error(`No ${quoteToken.symbol} token account found in wallet: ${wallet.publicKey}`);
     }
   
     quoteTokenAssociatedAddress = tokenAccount.pubkey;
-
-    //await populateJitoLeaderArray();
-  
+    //await populateJitoLeaderArray(); 
 }
 
 // Create transaction
-
-
 export async function buy(connection: Connection, newTokenAccount: PublicKey, poolState: LiquidityStateV4, marketDetails: MinimalMarketLayoutV3): Promise<void> {
     try {
       const ata = getAssociatedTokenAddressSync(poolState.quoteMint, wallet.publicKey);
@@ -145,7 +130,6 @@ export async function buy(connection: Connection, newTokenAccount: PublicKey, po
   
   
       let commitment: Commitment = retrieveEnvVariable('COMMITMENT_LEVEL', logger) as Commitment;
-
       const transaction = new VersionedTransaction(messageV0);
 
       transaction.sign([wallet, ...innerTransaction.signers]);
@@ -165,7 +149,6 @@ export async function buy(connection: Connection, newTokenAccount: PublicKey, po
   
   }
 
- 
 export async function sell(
   count:number,
   newTokenAccount: PublicKey,
@@ -197,7 +180,6 @@ export async function sell(
     // const shouldSell=await waitForSellSignal(amountIn, poolState, poolKeys)
     // Create a swap instruction for fixed output (receiving a specific amount of base tokens)
     // if(shouldSell){
-
       const { innerTransaction } = Liquidity.makeSwapFixedInInstruction(
         {
           poolKeys: poolKeys,
@@ -238,7 +220,6 @@ export async function sell(
         ],
       }).compileToV0Message();
       const transaction = new VersionedTransaction(messageV0);
-  
       // Send the transaction bundle to the Solana network
       await sendBundle(false,latestBlock.blockhash, messageV0, poolState.quoteMint);
     // }else{
@@ -247,7 +228,6 @@ export async function sell(
   } catch (error) {
     // Log any errors encountered during the process
     logger.error(error);
-
   }
 }
 
@@ -261,7 +241,6 @@ async function waitForSellSignal(amountIn: TokenAmount,poolstate:LiquidityStateV
   const profitAmount = new TokenAmount(Token.WSOL, profitFraction, true);
   const takeProfit = quoteAmount.add(profitAmount);
   
-
   const lossFraction = quoteAmount.mul(STOP_LOSS).numerator.div(new BN(100));
   const lossAmount = new TokenAmount(Token.WSOL, lossFraction, true);
   const  stopLoss = quoteAmount.subtract(lossAmount);
@@ -318,6 +297,5 @@ async function waitForSellSignal(amountIn: TokenAmount,poolstate:LiquidityStateV
       timesChecked++;
     }
   } while (timesChecked < timesToCheck);
-
   return true;
 }
