@@ -3,11 +3,9 @@ import { GetStructureSchema, MARKET_STATE_LAYOUT_V3, LiquidityStateV4, Token, To
 import { MINIMAL_MARKET_STATE_LAYOUT_V3 } from '../liquidity';
 import BN from 'bn.js';
 import { logger } from '../utils';
-
 export type MinimalMarketStateLayoutV3 = typeof MINIMAL_MARKET_STATE_LAYOUT_V3;
 export type MinimalMarketLayoutV3 =
   GetStructureSchema<MinimalMarketStateLayoutV3>;
-
 export async function getMinimalMarketV3(
   connection: Connection,
   marketId: PublicKey,
@@ -20,7 +18,6 @@ export async function getMinimalMarketV3(
       length: 32 * 3,
     },
   });
-
   return MINIMAL_MARKET_STATE_LAYOUT_V3.decode(marketInfo!.data);
 }
 
